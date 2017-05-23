@@ -1,0 +1,2 @@
+# trend_ml_toolkit_xgboost
+基于xgboost调参、模型训练，以及对各模型之间性能比较进行画图
