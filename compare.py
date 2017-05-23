@@ -1,9 +1,12 @@
 import xgboost as xgb
-from tools import get_predictedResults_from_file
-from xg_predict_comp import compare_models,compare_roc_auc,compare_pr_auc,compare_confusion_matrix
 import argparse
 import ConfigParser
 import pprint
+import pickle
+from xgboost import XGBClassifier
+
+from tools import get_predictedResults_from_file,get_csr_labels
+from xg_predict_comp import compare_models,compare_roc_auc,compare_pr_auc,compare_confusion_matrix
 
 # parser
 def arg_parser():
@@ -25,9 +28,10 @@ def conf_parser(conf_path,is_verbose=False):
     cf = ConfigParser.ConfigParser()
     cf.read(conf_path)
 
-    models_path = cf.get('compare','models_path').split(',')
+    models_path = cf.get('compare','model_paths').split(',')
     model_names_list = cf.get('compare', 'model_names').split(',')
     thres_list = cf.get('compare','thres').split(',')
+    thres_list = [float(i) for i in thres_list]
     marker_list = cf.get('compare','markers').split(',')
     dataset_list = cf.get('compare','datasets').split(',')
     dataset_f_list = cf.get('compare','dataset_formats').split(',')
@@ -57,16 +61,25 @@ if __name__ == '__main__':
     labels_list = list()
     pred_scores_list = list()
 
-    for i,f in enumerate(dataset_f_list[:3]):
+    for i,f in enumerate(dataset_f_list):
         print('=============================')
-        if f in 'xgboost':
+        if f  == 'xgboost':
             print(dataset_list[i])
+            print(models_path[i])
             dtest = xgb.DMatrix(dataset_list[i])
             labels = dtest.get_label()
-            print(models_path[i])
+            labels = labels.astype(int)
             model_temp = xgb.Booster(model_file=models_path[i])
             labels_pred = model_temp.predict(dtest)
             labels_list.append(labels)
+            pred_scores_list.append(labels_pred)
+        elif f == 'xgb_pickle':
+            print(dataset_list[i])
+            print(models_path[i])
+            x,y = get_csr_labels(dataset_list[i])
+            model_temp = pickle.load(open(models_path[i],'r'))
+            labels_pred = model_temp.predict(x)
+            labels_list.append(y)
             pred_scores_list.append(labels_pred)
         elif f in 'svm':
             print(dataset_list[i])
@@ -86,7 +99,7 @@ if __name__ == '__main__':
     # re = zip(pred_scores.tolist(),pred_scores_t.tolist())
     # pprint.pprint(pred_scores)
     # pprint.pprint(pred_scores_un)
-    print("*****  pred_scores    *******")
+    # print("*****  pred_scores    *******")
     # pprint.pprint(re)
     # svm_labels, pred_scores_svm = get_predictedResults_from_file('Data/OC-vuq2/rslt_app2.txt')
 
@@ -97,10 +110,9 @@ if __name__ == '__main__':
     # model_names_list = ['untuned_xgb','tuned_xgb','svm']
     # thres_list = [0.5,0.5,0.0]
     # marker_list = ['g-','r-','b-']
-    is_eq_greater_list = [1,1,1]
-
-    measures_all,re_p_r_t_basedOnP = compare_models(labels_list,pred_scores_list,model_names_list,thres_list,is_eq_greater_list)
-    pprint.pprint(re_p_r_t_basedOnP)
+    # is_eq_greater_list = [1,1,1]
+    print(labels_list,pred_scores_list)
+    measures_all = compare_models(labels_list,pred_scores_list,model_names_list,thres_list)
     compare_roc_auc(fid=1,measures=measures_all,marker_list=marker_list)
     compare_pr_auc(fid=2, measures=measures_all, marker_list=marker_list)
     compare_roc_auc(fid=3, measures=measures_all,axis_interval=[0,1,0.9,1],marker_list=marker_list)

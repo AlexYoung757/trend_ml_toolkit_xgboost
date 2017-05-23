@@ -254,9 +254,10 @@ if __name__ == '__main__':
     }
     '''
     # tune num_boost_round
-    num_boost_round = t_params['t_num_round']
-    tune_num_boost_round()
-    params_sklearn['n_estimators'] = num_boost_round
+    # num_boost_round = t_params['t_num_round']
+    # tune_num_boost_round()
+    # params_sklearn['n_estimators'] = num_boost_round
+    params_sklearn['n_estimators'] = 1000
 
     # eval_metric = 'auc'
     # early_stopping_rounds = 10
@@ -319,8 +320,8 @@ if __name__ == '__main__':
     set_params_no_sklearn()
     print_params(params_no_sklearn)
     # tune the num_boost_round again
-    tune_num_boost_round()
-
+    # tune_num_boost_round()
+    num_boost_round = 1000
     model = xgb.train(params_no_sklearn,dtrain=dtrain_whole,num_boost_round=num_boost_round,evals=watchlist_whole)
     time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
 

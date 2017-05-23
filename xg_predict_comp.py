@@ -4,8 +4,10 @@ from sklearn.metrics import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from tools import get_predictedResults_from_file
 import pprint
+
+from tools import get_predictedResults_from_file
+
 
 global num_thres
 num_thres = 0
@@ -105,7 +107,7 @@ def sort_pr(precisions,recalls,tprs,fprs,is_p,is_t):
         f.append(all_roc[i][1])
     return p,r,t,f
 
-def get_labels(preds_prob,thres,is_eq_greater):
+def get_labels(preds_prob,thres,is_eq_greater=1):
     labels = []
     if is_eq_greater == 1:
         for prob in preds_prob:
@@ -120,51 +122,33 @@ def get_labels(preds_prob,thres,is_eq_greater):
             else:
                 labels.append(0)
     return labels
-def calcu_measures(labels,preds_prob,model_name,thres,is_eq_greater):
-    global num_thres
-    preds_label = get_labels(preds_prob,thres,is_eq_greater)
+
+def calcu_measures(labels,preds_prob,model_name,thres):
+
+    preds_label = get_labels(preds_prob,thres)
     tn, fp, fn, tp = confusion_matrix(labels, preds_label).ravel()
-    """
-    if is_eq_greater == 1:
-        print '11111'
-        preds_label = get_labels_by_thres_eq_greater(preds_prob,thres)
-    else:
-        print '00000'
-        preds_label = get_labels_by_thres_greater(preds_prob,thres)
-    """
+
     measures = dict()
+    measures['model_name'] = model_name
+    # 这些值都是基于一定的切分阈值计算出来的
     measures['tn'] = tn
     measures['fp'] = fp
     measures['fn'] = fn
     measures['tp'] = tp
-    measures['model_name'] = model_name
     measures['accuracy'] = accuracy_score(labels,preds_label)
-    # bug
-    measures['pr_auc'] = average_precision_score(labels,preds_prob)
     measures['classification_report'] = classification_report(labels,preds_label,target_names=['0','1'])
     measures['confusion_matrix'] = confusion_matrix(labels,preds_label,labels=[0,1])
     measures['f1'] = f1_score(labels,preds_label,pos_label=1)
     measures['precision'] = precision_score(labels,preds_label,pos_label=1)
     measures['recall'] = recall_score(labels,preds_label,pos_label=1)
-    print '...........',measures['recall']
-    if is_eq_greater == 1:
-        measures['fprs'], measures['tprs'], _ = roc_curve(labels, preds_prob,pos_label=1)
-        # measures['fprs'], measures['tprs'], measures['thresholds_roc'] = roc_curve(labels, preds_prob)
-        measures['precisions'], measures['recalls'], thresholds_pr = precision_recall_curve(labels,preds_prob,pos_label=1)
-        print("**************** sort  *********")
-        re = zip(measures['precisions'],measures['recalls'],thresholds_pr)
-        re_temp = []
-        for item in re:
-            if(item[0]>=0.982684 and item[1]>=0.965726):
-                re_temp.append(item)
-        re_temp.sort(key=lambda k:k[0],reverse=True)
-        pprint.pprint(re_temp[:10])
-        num_thres = len(thresholds_pr)
-        # measures['precisions'], measures['recalls'], measures['thresholds_pr'] = precision_recall_curve(labels,preds_prob,pos_label=1)
-    else:
-        measures['precisions'],measures['recalls'],measures['tprs'],measures['fprs'] = get_precisions_recalls_tprs_fprs(labels,preds_prob,is_eq_greater=0)
+    # 这些无需基于阈值
+    measures['fprs'], measures['tprs'], measures['thresholds_roc'] = roc_curve(labels, preds_prob,pos_label=1)
+    measures['precisions'], measures['recalls'], measures['thresholds_pr'] = precision_recall_curve(labels,preds_prob,pos_label=1)
     measures['roc_auc'] = auc(measures['fprs'], measures['tprs'])
-    return measures,re_temp
+    measures['pr_auc'] = auc(measures['recalls'], measures['precisions'])# 对于pr_auc的计算，上下两种方式都可以
+    # measures['pr_auc'] = average_precision_score(labels, preds_prob)
+
+    return measures
 """
 def combine_measures(measures0,measures1):
     measures = dict()
@@ -242,25 +226,18 @@ def compare_model(labels,preds_prob0,preds_prob1,model_name0,model_name1):
     # compare_roc_auc(measures)
     # compare_pr_auc(measures)
 """
-def compare_models(labels_list,pred_scores_list,model_names_list,thres_list,is_eq_greater_list):
+def compare_models(labels_list,pred_scores_list,model_names_list,thres_list):
     measures_list = []
-    re_p_r_t_basedOnP = []
-    # 条件检测
-
     # 度量计算
     for i in range(len(pred_scores_list)):
-        measures,re = calcu_measures(labels=labels_list[i],preds_prob=pred_scores_list[i],model_name=model_names_list[i],thres=thres_list[i],is_eq_greater=is_eq_greater_list[i])
-        if len(re)!=0:
-            re_p_r_t_basedOnP.append(re[0])
-        else:
-            re_p_r_t_basedOnP.append(re)
+        measures = calcu_measures(labels=labels_list[i],preds_prob=pred_scores_list[i],model_name=model_names_list[i],thres=thres_list[i])
         measures_list.append(measures)
     measures_all = combine_measuresList(measures_list)
     df = pd.DataFrame(measures_all,index=[measures_all['model_name'][i] for i in range(len(pred_scores_list))])
-    # df = df.drop(['model_name','classification_report','confusion_matrix','fpr','precisions','recalls','thresholds_pr','thresholds_roc','tpr'],axis=1)
-    df = df.drop(['model_name','classification_report','confusion_matrix','precisions','recalls','fprs','tprs'],axis=1)
+    df = df.drop(['model_name','classification_report','confusion_matrix','fprs','tprs','precisions','recalls','thresholds_pr','thresholds_roc'],axis=1)
+    # df = df.drop(['model_name','classification_report','confusion_matrix','precisions','recalls','fprs','tprs'],axis=1)
     print df.T
-    return measures_all,re_p_r_t_basedOnP
+    return measures_all
 def IsListSorted_sorted(lst):
     return sorted(lst) == lst or sorted(lst, reverse=True) == lst
 if __name__ == '__main__':
