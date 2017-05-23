@@ -1,7 +1,7 @@
 #coding=utf-8
 import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier,cv
 import pprint
 import pandas as pd
 import time
