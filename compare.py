@@ -115,6 +115,6 @@ if __name__ == '__main__':
     measures_all = compare_models(labels_list,pred_scores_list,model_names_list,thres_list)
     compare_roc_auc(fid=1,measures=measures_all,marker_list=marker_list)
     compare_pr_auc(fid=2, measures=measures_all, marker_list=marker_list)
-    compare_roc_auc(fid=3, measures=measures_all,axis_interval=[0,1,0.9,1],marker_list=marker_list)
-    compare_pr_auc(fid=4, measures=measures_all, axis_interval=[0,1,0.9,1],marker_list=marker_list)
+    compare_roc_auc(fid=3, measures=measures_all,axis_interval=[0,1,0.99,1],marker_list=marker_list)
+    compare_pr_auc(fid=4, measures=measures_all, axis_interval=[0,1,0.99,1],marker_list=marker_list)
     compare_confusion_matrix(measures_all)
