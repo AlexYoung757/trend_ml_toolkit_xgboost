@@ -49,7 +49,6 @@ def conf_parser(conf_path):
     save_period = int(cf.get('xg_conf', 'save_period'))
     eval = int(cf.get('xg_conf', 'eval'))
     cv = int(cf.get('xg_conf','cv'))
-    n_jobs = int(cf.get('xg_conf','n_jobs'))
 
     t_num_round = int(cf.get('xg_conf','num_round'))
     t_max_depth = [int(i) for i in cf.get('xg_conf','max_depth').split(',')]
@@ -65,7 +64,7 @@ def conf_parser(conf_path):
              'refresh_leaf':refresh_leaf,'base_score':base_score,'eval_metric':eval_metric,
              'seed':seed,'nthread': nthread}
 
-    others = {'num_round':num_round,'cv':cv,'n_jobs':n_jobs,'ascend':ascend}
+    others = {'num_round':num_round,'cv':cv,'ascend':ascend}
     data = cf.get('xg_conf', 'data')
 
     if int(cf.get('xg_conf','xgmat'))==0: # if it is not a xgmat file, than convert it
@@ -113,7 +112,7 @@ if __name__ == '__main__':
     scale_pos_weight = get_negative_positive_ratio(y)
     params['scale_pos_weight'] = scale_pos_weight
     # tune the parameter num_round
-    num_round = tune_num_boost_round(params,dtrain,params_t['num_round'],watchlist,ascend=params_other['ascend'])
+    num_round = tune_num_boost_round(params,dtrain,params_other['num_round'],watchlist,ascend=params_other['ascend'])
 
     params_t = [dict(max_depth=params_t['max_depth']),
                 dict(subsample=params_t['subsample']),
@@ -127,12 +126,16 @@ if __name__ == '__main__':
         # pprint.pprint(params)
         print('========== ',k,' ========== ',values)
         result = []
+        if(len(values) == 1):
+            params[k] = values[0]
+            continue
         for v in values:
+            print('**** for : %s ****\n'%(str(v)))
             params[k] = v
             result_df = xgb.cv(params=params,
                                dtrain=dtrain_whole,
                                num_boost_round=num_round,
-                               nfold=params_other['n_jobs'],
+                               nfold=params_other['cv'],
                                metrics=params['eval_metric'],
                                verbose_eval=False,
                                show_stdv=False,
@@ -148,7 +151,7 @@ if __name__ == '__main__':
             loc = min(enumerate(result),key=lambda x:x[1])[0]
         params[k] = values[loc]
         print('%s : %s\n'%(k,params[k]))
-    num_round = tune_num_boost_round(params,dtrain_whole,num_round,watchlist_whole,ascend=params_other['ascend'])
+    num_round = tune_num_boost_round(params,dtrain_whole,params_other['num_round'],watchlist_whole,ascend=params_other['ascend'])
     model = xgb.train(params,dtrain_whole,num_round,watchlist_whole)
     pprint.pprint(params)
     time_str = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
