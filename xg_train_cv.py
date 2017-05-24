@@ -93,6 +93,8 @@ def get_negative_positive_ratio(y):
 def tune_num_boost_round(params,dtrain,num_boost_round,watchlist,eval_metric,feval=None,ascend=True):
 
     evals_result = {}
+    if(feval==None):
+        params['eval_metric'] = eval_metric
     xgb.train(params=params,dtrain=dtrain,num_boost_round=num_boost_round,evals=watchlist,feval=feval,evals_result=evals_result)
     evals_result = evals_result['eval'][eval_metric]
     if(ascend==True):
@@ -169,6 +171,8 @@ if __name__ == '__main__':
         for v in values:
             print('**** for : %s ****\n'%(str(v)))
             params[k] = v
+            if (custom_feval == None):
+                params['eval_metric'] = params_other['eval_metric']
             result_df = xgb.cv(params=params,
                                dtrain=dtrain_whole,
                                num_boost_round=num_round,
