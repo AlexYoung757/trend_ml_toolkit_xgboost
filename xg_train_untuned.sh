@@ -1,1 +1,1 @@
-python xg_train_untuned.py -c xg_train_untuned.config -o ./Models/features/untuned.xgmodel
+python xg_train_untuned.py -c xg_train_untuned.config -o ./Models/OC-vuq1/untuned.xgmodel
