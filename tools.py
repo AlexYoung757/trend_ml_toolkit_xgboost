@@ -97,7 +97,7 @@ def read_label(path):
 def save2xgdata(fe_path, la_path):
     label = read_label(la_path)
     # feature and label is in numpy.asarray format
-    saver = open(fe_path+'.xgmat', 'w')
+    saver = open(fe_path+'.libsvm', 'w')
     with open(fe_path, 'r') as data_fi:
     	lines = data_fi.readlines()
     	dimension = int(lines[0].strip())
