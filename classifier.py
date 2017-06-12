@@ -5,6 +5,11 @@ import numpy as np
 import os
 import glob
 from pprint import pprint
+from multiprocessing import Pool
+import multiprocessing
+
+def start_process():
+    print 'Starting',multiprocessing.current_process().name
 
 def dirlist(path, allfile):
     filelist = os.listdir(path)
@@ -16,6 +21,20 @@ def dirlist(path, allfile):
         else:
             allfile.append(filepath)
     return allfile
+
+def search_mv(i,refer,files):
+    print("%d / %d\n" % (i, len(refer)))
+    item = refer[i]
+    file_name = item[0] + '.opcode'
+    flag = bool(item[1])
+    cases = files[files[:, 1] == file_name]
+    if (len(cases) != 0):
+        case_file = cases[0]
+        if (phase == 'train'):
+            re_path = result_path0 if flag == 0  else result_path1
+        else:
+            re_path = result_path2 if flag == 0  else result_path3
+        shutil.copy(case_file[0], re_path)
 
 if __name__ == '__main__':
 
@@ -55,6 +74,12 @@ if __name__ == '__main__':
     else:
         refer = test_np
 
+    pool = Pool(processes=None,initializer=start_process)
+    pool.map(search_mv(refer=refer,files=files),range(len(refer)))
+    pool.close()
+    pool.join()
+
+    """
     for i in range(len(refer)):
         print("%d / %d\n"%(i,len(refer)))
         item = refer[i]
@@ -71,3 +96,4 @@ if __name__ == '__main__':
             shutil.copy(case_file[0],re_path)
     print('refer  :  %d\n'%(len(refer)))
     print('origin :  %d\n'%(len(files)))
+    """
