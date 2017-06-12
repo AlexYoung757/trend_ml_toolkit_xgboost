@@ -68,7 +68,6 @@ if __name__ == '__main__':
                 re_path = result_path0 if flag == 0  else result_path1
             else:
                 re_path = result_path2 if flag == 0  else result_path3
-            print('%s  ====>  %s\n'%(case_file[0],re_path))
             shutil.copy(case_file[0],re_path)
     print('refer  :  %d\n'%(len(refer)))
     print('origin :  %d\n'%(len(files)))
