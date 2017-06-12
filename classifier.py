@@ -6,9 +6,22 @@ import os
 import glob
 from pprint import pprint
 
+def dirlist(path, allfile):
+    filelist = os.listdir(path)
+
+    for filename in filelist:
+        filepath = os.path.join(path, filename)
+        if os.path.isdir(filepath):
+            dirlist(filepath, allfile)
+        else:
+            allfile.append(filepath)
+    return allfile
+
 if __name__ == '__main__':
 
     phase = 'train'
+
+    handle_path = '/macml-data/features/opcode'
 
     result_path0 = '/home/lili/opcode-2017-05/train/0'
     result_path1 = '/home/lili/opcode-2017-05/train/1'
@@ -20,6 +33,7 @@ if __name__ == '__main__':
     for r in result_paths:
         if(os.path.exists(r) == False):
             os.makedirs(r)
+            pass
 
     train_csv = '/home/lili/datasets/2017-05_train.csv'
     test_csv = '/home/lili/datasets/2017-05_test.csv'
@@ -30,24 +44,12 @@ if __name__ == '__main__':
     train_np = train_df.as_matrix()
     test_np = test_df.as_matrix()
 
-    handle_path = '/macml-data/features/opcode'
-    now_path = os.path.abspath(handle_path)
-    subfolders = os.listdir(now_path)
-    search_paths = []
-    for p in subfolders:
-        temp = os.path.join(now_path, p)
-        if(os.path.isdir(temp)):
-            search_paths.append(temp)
-    files =  []
-    for p in search_paths:
-        files_per_dir = glob.glob(p+'/*')
-        files.extend(files_per_dir)
+    files = dirlist(handle_path,[])
     files = np.array(files)
     files = files[:,np.newaxis]
     files = np.concatenate((files,files),axis=1)
     for i in range(len(files)):
         files[i,1] = files[i,1].split('/')[-1]
-
     if(phase == 'train'):
         refer = train_np
     else:
@@ -68,3 +70,5 @@ if __name__ == '__main__':
                 re_path = result_path2 if flag == 0  else result_path3
             print('%s  ====>  %s\n'%(case_file[0],re_path))
             shutil.copy(case_file[0],re_path)
+    print('refer  :  %d\n'%(len(refer)))
+    print('origin :  %d\n'%(len(files)))

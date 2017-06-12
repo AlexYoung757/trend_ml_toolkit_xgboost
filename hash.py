@@ -3,6 +3,11 @@
 import hashlib
 import sha3
 
+def get_config():
+    config = dict()
+    config['base_path'] = '/home/lili/opcode-07'
+    config['re_path'] = '/home/lili'
+
 
 if __name__ == '__main__':
 
