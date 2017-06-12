@@ -8,6 +8,7 @@ from tqdm import tqdm
 import multiprocessing
 from multiprocessing import Pool
 import pandas as pd
+from functools import partial
 
 def start_process():
     print 'Starting',multiprocessing.current_process().name
@@ -59,8 +60,9 @@ if __name__ == '__main__':
     config = get_config()
     files = dirlist(config['handle_path'],[])
     N = len(files)
+    partial_handle_f = partial(handle_f,files=files,config=config)
     pool = Pool(processes=None,initializer=start_process)
-    pool_outputs=pool.map(handle_f(files=files,config=config),range(N))
+    pool_outputs=pool.map(partial_handle_f,range(N))
     pool.close()
     pool.join()
     """

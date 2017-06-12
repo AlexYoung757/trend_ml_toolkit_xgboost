@@ -7,6 +7,7 @@ import glob
 from pprint import pprint
 from multiprocessing import Pool
 import multiprocessing
+from functools import partial
 
 def start_process():
     print 'Starting',multiprocessing.current_process().name
@@ -38,7 +39,7 @@ def search_mv(i,refer,files):
 
 if __name__ == '__main__':
 
-    phase = 'train'
+    phase = 'test'
 
     handle_path = '/macml-data/features/opcode'
 
@@ -74,8 +75,9 @@ if __name__ == '__main__':
     else:
         refer = test_np
 
+    partial_search_mv = partial(search_mv,refer=refer,files=files)
     pool = Pool(processes=None,initializer=start_process)
-    pool.map(search_mv(refer=refer,files=files),range(len(refer)))
+    pool.map(partial_search_mv,range(len(refer)))
     pool.close()
     pool.join()
 
