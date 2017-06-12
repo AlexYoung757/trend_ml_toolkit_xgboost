@@ -21,8 +21,8 @@ if __name__ == '__main__':
         if(os.path.exists(r) == False):
             os.makedirs(r)
 
-    train_csv = '2017-05_train.csv'
-    test_csv = '2017-05_test.csv'
+    train_csv = '/home/lili/datasets/2017-05_train.csv'
+    test_csv = '/home/lili/datasets/2017-05_test.csv'
 
     train_df = pd.read_csv(train_csv)
     test_df = pd.read_csv(test_csv)
@@ -30,8 +30,9 @@ if __name__ == '__main__':
     train_np = train_df.as_matrix()
     test_np = test_df.as_matrix()
 
-    now_path = os.path.abspath('.')
-    subfolders = os.listdir('.')
+    handle_path = '/macml-data/features/opcode'
+    now_path = os.path.abspath(handle_path)
+    subfolders = os.listdir(now_path)
     search_paths = []
     for p in subfolders:
         temp = os.path.join(now_path, p)
@@ -64,4 +65,5 @@ if __name__ == '__main__':
                 re_path = result_path0 if flag == 0  else result_path1
             else:
                 re_path = result_path2 if flag == 0  else result_path3
+            print('%s  ====>  %s\n'%(case_file[0],re_path))
             shutil.copy(case_file[0],re_path)
