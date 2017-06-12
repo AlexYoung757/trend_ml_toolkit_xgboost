@@ -1,10 +1,12 @@
 #coding=utf-8
 
 import hashlib
+import sha3
 
 
 if __name__ == '__main__':
 
+    """
     x = hashlib.md5()
     x.update('hello, ')
     x.update('python')
@@ -17,3 +19,5 @@ if __name__ == '__main__':
     assert con0 == con1
     con2 = hashlib.md5('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx').hexdigest()
     print(len(con2))
+    """
+    x = hashlib.shake_128('11111').hexdi

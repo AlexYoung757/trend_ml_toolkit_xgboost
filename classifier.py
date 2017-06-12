@@ -54,6 +54,7 @@ if __name__ == '__main__':
         refer = test_np
 
     for i in range(len(refer)):
+        print("%d / %d\n"%(i,len(refer)))
         item = refer[i]
         file_name = item[0]+'.opcode'
         flag = bool(item[1])
