@@ -44,7 +44,7 @@ def handle_f(i,files,config):
     assert phase == 'train' or flag == 'test'
     with open(f_full_name) as f:
         content = f.read()
-    fea_str = hashlib.shake_128(content).hexdigest(length=config['length'] / 8)
+    fea_str = hashlib.shake128(config['length'], content).hexdigest()
     fea_str_bit = hexstr2bitstr(fea_str)
     fea_str_bit = np.array(fea_str_bit)
     fea_str_bit = fea_str_bit.reshape((1, -1))
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         assert phase == 'train' or phase == 'test'
         with open(f_full_name) as f:
             content = f.read()
-        fea_str = hashlib.shake_128(content).hexdigest(length=config['length']/8)
+        fea_str = hashlib.shake128(config['length'],content).hexdigest()
         fea_str_bit = hexstr2bitstr(fea_str)
         fea_str_bit = np.array(fea_str_bit)
         fea_str_bit = fea_str_bit.reshape((1,-1))
@@ -86,5 +86,7 @@ if __name__ == '__main__':
             os.makedirs(base_path)
         fea_names = [ 'f'+str(i) for i in range(config['length'])]
         r = pd.DataFrame(data=fea_str_bit,columns=fea_names)
-        r.to_csv(base_path+'/'+f_name)
+        r.to_csv(base_path+'/'+f_name+'.csv')
+        print(r)
+        print(r.columns)
 
