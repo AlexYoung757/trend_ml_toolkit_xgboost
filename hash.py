@@ -33,6 +33,7 @@ def get_config():
     config['handle_path'] = '/home/lili/opcode-07'
     config['re_path'] = '/home/lili'
     config['length'] = 1024
+    return config
 
 def handle_f(i,files,config):
     f_full_name = files[i]
@@ -40,7 +41,7 @@ def handle_f(i,files,config):
     flag = f_full_name.split('/')[-2]
     assert flag == '0' or flag == '1'
     phase = f_full_name.split('/')[-3]
-    assert flag == 'train' or flag == 'test'
+    assert phase == 'train' or flag == 'test'
     with open(f_full_name) as f:
         content = f.read()
     fea_str = hashlib.shake_128(content).hexdigest(length=config['length'] / 8)

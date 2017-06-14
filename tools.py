@@ -119,6 +119,17 @@ def save2xgdata(fe_path, la_path):
             saver.writelines(data_str+'\n')
     print('Finished read feature')
 
+def dirlist(path, allfile):
+    filelist = os.listdir(path)
+
+    for filename in filelist:
+        filepath = os.path.join(path, filename)
+        if os.path.isdir(filepath):
+            dirlist(filepath, allfile)
+        else:
+            allfile.append(filepath)
+    return allfile
+
 if __name__ == '__main__':
     # labels,preds_score = get_predictedResults_from_file('Data/rslt_app.txt')
     # print labels,preds_score
