@@ -30,8 +30,8 @@ def dirlist(path, allfile):
 
 def get_config():
     config = dict()
-    config['handle_path'] = '/home/lili/opcode-07'
-    config['re_path'] = '/home/lili'
+    config['handle_path'] = '/home/lili/opcode-2017-05'
+    config['re_path'] = '/home/lili/opcode-2017-05-hash2'
     config['length'] = 1024
     return config
 
@@ -61,19 +61,19 @@ if __name__ == '__main__':
     config = get_config()
     files = dirlist(config['handle_path'],[])
     N = len(files)
-    partial_handle_f = partial(handle_f,files=files,config=config)
-    pool = Pool(processes=None,initializer=start_process)
-    pool_outputs=pool.map(partial_handle_f,range(N))
-    pool.close()
-    pool.join()
-    """
+    # partial_handle_f = partial(handle_f,files=files,config=config)
+    # pool = Pool(processes=None,initializer=start_process)
+    # pool_outputs=pool.map(partial_handle_f,range(N))
+    # pool.close()
+    # pool.join()
+
     for i in tqdm(range(N)):
         f_full_name = files[i]
         f_name = f_full_name.split('/')[-1]
         flag = f_full_name.split('/')[-2]
         assert flag == '0' or flag == '1'
         phase = f_full_name.split('/')[-3]
-        assert flag == 'train' or flag == 'test'
+        assert phase == 'train' or phase == 'test'
         with open(f_full_name) as f:
             content = f.read()
         fea_str = hashlib.shake_128(content).hexdigest(length=config['length']/8)
@@ -87,4 +87,4 @@ if __name__ == '__main__':
         fea_names = [ 'f'+str(i) for i in range(config['length'])]
         r = pd.DataFrame(data=fea_str_bit,columns=fea_names)
         r.to_csv(base_path+'/'+f_name)
-    """
+
