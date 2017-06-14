@@ -21,13 +21,13 @@ def get_sample_label(f_list):
         case = f_list[i]
         split_list = case.split('/')
         phase = split_list[-3]
-        label = int(split_list[-2])
-        with open(case,mode='r') as f:
-            x = f.read()
-            x = x.split(',')
-            x = [int(item) for item in x]
-            assert len(x) == 1024
         assert phase == 'train' or phase == 'test'
+        label = int(split_list[-2])
+        x_df = pd.read_csv(case)
+        x = x_df[0][0]
+        x = x.split(',')
+        x = [int(item) for item in x]
+        assert len(x) == 1024
         if(phase == 'train'):
             X_train.append(x)
             Y_train.append(label)
