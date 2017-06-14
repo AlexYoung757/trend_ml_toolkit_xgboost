@@ -17,11 +17,11 @@ def hexstr2bitstr(string):
     hex_list = [format(int(c,16),'b') for c in string ]
     re_list = []
     for l in hex_list:
-	len_l = len(l)
-	for i in range(4-len_l):
-	    l = '0'+l
-	assert len(l) == 4
-	re_list.append(l)
+        len_l = len(l)
+        for i in range(4-len_l):
+            l = '0'+l
+        assert len(l) == 4
+        re_list.append(l)
     temp = ''.join(re_list)
     temp = [c for c in temp]
     return temp

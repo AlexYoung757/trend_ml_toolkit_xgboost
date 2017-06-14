@@ -6,7 +6,7 @@ import pickle
 from xgboost import XGBClassifier
 
 from tools import get_predictedResults_from_file,get_csr_labels
-from xg_predict_comp import compare_models,compare_roc_auc,compare_pr_auc,compare_confusion_matrix
+from xg_predict_comp import compare_models,compare_roc_auc,compare_pr_auc,compare_confusion_matrix,compare_path_score
 
 # parser
 def arg_parser():
@@ -24,6 +24,8 @@ def conf_parser(conf_path,is_verbose=False):
     global marker_list
     global dataset_list
     global dataset_f_list
+    global label_f_list
+
 
     cf = ConfigParser.ConfigParser()
     cf.read(conf_path)
@@ -35,6 +37,7 @@ def conf_parser(conf_path,is_verbose=False):
     marker_list = cf.get('compare','markers').split(',')
     dataset_list = cf.get('compare','datasets').split(',')
     dataset_f_list = cf.get('compare','dataset_formats').split(',')
+    label_f_list = cf.get('compare','labels').split(',')
 
     if is_verbose:
         pprint.pprint(models_path)
@@ -50,6 +53,7 @@ if __name__ == '__main__':
     marker_list = None
     dataset_list = None
     dataset_f_list = None
+    label_f_list = None
 
     arg = arg_parser()
     conf_parser(arg.conf,is_verbose=True)
@@ -118,3 +122,4 @@ if __name__ == '__main__':
     compare_roc_auc(fid=3, measures=measures_all,axis_interval=[0,1,0.9,1],marker_list=marker_list)
     compare_pr_auc(fid=4, measures=measures_all, axis_interval=[0,1,0.9,1],marker_list=marker_list)
     compare_confusion_matrix(measures_all)
+    compare_path_score(label_path_list=label_f_list,scores_list=pred_scores_list,model_name_list=model_names_list)

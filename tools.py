@@ -76,6 +76,18 @@ def dirlist(path, allfile):
             allfile.append(filepath)
     return allfile
 
+# read path
+def read_sample_path(path):
+    with open(path, 'r') as label_fi:
+        paths = []
+        for line in label_fi.readlines():
+            temp = line.split('|')[1]
+            paths.append(temp)
+        sample_paths = np.asarray(paths)
+
+    print('Finished read path')
+    return sample_paths
+
 # read label
 def read_label(path):
     with open(path, 'r') as label_fi:

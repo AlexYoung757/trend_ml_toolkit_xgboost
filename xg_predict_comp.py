@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pprint
 
-from tools import get_predictedResults_from_file
+from tools import get_predictedResults_from_file,read_sample_path
 
 
 global num_thres
@@ -238,6 +238,25 @@ def compare_models(labels_list,pred_scores_list,model_names_list,thres_list):
     # df = df.drop(['model_name','classification_report','confusion_matrix','precisions','recalls','fprs','tprs'],axis=1)
     print df.T
     return measures_all
+def get_score(path,score):
+    path = np.reshape((-1,1))
+    score = np.reshape((-1,1))
+    whole = np.concatenate((path,score),axis=1)
+    return whole
+
+def compare_path_score(label_path_list,scores_list,model_name_list):
+    assert len(label_path_list) == len(scores_list),'数目不等！'
+    all = []
+    for i in range(len(label_path_list)):
+        case_label_path = label_path_list[i]
+        if(case_label_path != '_'):
+            this_model = get_score(read_sample_path(case_label_path),scores_list[i])
+            df = pd.DataFrame(this_model)
+            print('======  %s  ===='%(model_name_list[i]))
+            print(df)
+            all.append(this_model)
+    return all
+
 def IsListSorted_sorted(lst):
     return sorted(lst) == lst or sorted(lst, reverse=True) == lst
 if __name__ == '__main__':

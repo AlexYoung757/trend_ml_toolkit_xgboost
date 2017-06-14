@@ -9,7 +9,7 @@ from tools import dirlist
 def get_config():
     config = dict()
     config['data_path'] = '/home/lili/opcode-2017-05-hash/'
-    config['re_path'] = './Output/'
+    config['re_path'] = './Data/opcode-2017-05-hash'
     return config
 
 def get_sample_label(f_list):
