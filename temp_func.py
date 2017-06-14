@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.datasets import dump_svmlight_file
+from tqdm import  tqdm
 
 from tools import dirlist
 
@@ -16,7 +17,8 @@ def get_sample_label(f_list):
     Y_train = []
     X_test = []
     Y_test = []
-    for case in f_list:
+    for i in tqdm(range(len(f_list))):
+        case = f_list[i]
         split_list = case.split('/')
         phase = split_list[-3]
         label = int(split_list[-2])
