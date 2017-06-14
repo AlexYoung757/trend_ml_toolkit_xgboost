@@ -64,7 +64,7 @@ def handle_f(i,files,config):
         os.makedirs(base_path)
     fea_names = ['f' + str(i) for i in range(config['length'])]
     r = pd.DataFrame(data=fea_str_bit, columns=fea_names)
-    r.to_csv(base_path + '/' + f_name+'.csv')
+    r.to_csv(base_path + '/' + f_name+'.csv',index=False)
     #print(r.columns)
     assert len(r.columns == config['length'])
     #print(r.columns)
