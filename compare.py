@@ -24,7 +24,7 @@ def conf_parser(conf_path,is_verbose=False):
     global marker_list
     global dataset_list
     global dataset_f_list
-    global label_f_list
+    # global label_f_list
 
 
     cf = ConfigParser.ConfigParser()
@@ -37,7 +37,7 @@ def conf_parser(conf_path,is_verbose=False):
     marker_list = cf.get('compare','markers').split(',')
     dataset_list = cf.get('compare','datasets').split(',')
     dataset_f_list = cf.get('compare','dataset_formats').split(',')
-    label_f_list = cf.get('compare','labels').split(',')
+    # label_f_list = cf.get('compare','labels').split(',')
 
     if is_verbose:
         pprint.pprint(models_path)
@@ -57,10 +57,6 @@ if __name__ == '__main__':
 
     arg = arg_parser()
     conf_parser(arg.conf,is_verbose=True)
-
-    # path_model_untuned = 'Models/OC-vuq2/untuned.xgmodel'
-    # path_model = 'Models/OC-vuq2/tuned_2017_04_25_14_10_31.xgmodel'
-    # dtest_path = 'Data/OC-vuq2/NN_train.txt.xgmat'
 
     labels_list = list()
     pred_scores_list = list()
@@ -92,34 +88,9 @@ if __name__ == '__main__':
             labels_list.append(svm_labels)
             pred_scores_list.append(pred_scores_svm)
 
-    # model_untuned = xgb.Booster(model_file=path_model_untuned)
-    # model = xgb.Booster(model_file=path_model)
-
-    # dtest = xgb.DMatrix(dtest_path)
-    # labels = dtest.get_label()
-    # pred_scores_un = model_untuned.predict(dtest)
-    # pred_scores = model.predict(dtest,output_margin=False)
-    # pred_scores_t = model.predict(dtest,output_margin=False)
-    # re = zip(pred_scores.tolist(),pred_scores_t.tolist())
-    # pprint.pprint(pred_scores)
-    # pprint.pprint(pred_scores_un)
-    # print("*****  pred_scores    *******")
-    # pprint.pprint(re)
-    # svm_labels, pred_scores_svm = get_predictedResults_from_file('Data/OC-vuq2/rslt_app2.txt')
-
-    # labels_list = [labels,labels,svm_labels]
-    # pred_scores_list = [pred_scores_un,pred_scores,pred_scores_svm]
-    # print len(pred_scores_un),len(pred_scores),len(pred_scores_svm)
-    # print pred_scores_un[:10],pred_scores[:10],pred_scores_svm[:10]
-    # model_names_list = ['untuned_xgb','tuned_xgb','svm']
-    # thres_list = [0.5,0.5,0.0]
-    # marker_list = ['g-','r-','b-']
-    # is_eq_greater_list = [1,1,1]
-    print(labels_list,pred_scores_list)
     measures_all = compare_models(labels_list,pred_scores_list,model_names_list,thres_list)
     compare_roc_auc(fid=1,measures=measures_all,marker_list=marker_list)
     compare_pr_auc(fid=2, measures=measures_all, marker_list=marker_list)
     compare_roc_auc(fid=3, measures=measures_all,axis_interval=[0,1,0.9,1],marker_list=marker_list)
     compare_pr_auc(fid=4, measures=measures_all, axis_interval=[0,1,0.9,1],marker_list=marker_list)
     compare_confusion_matrix(measures_all)
-    compare_path_score(label_path_list=label_f_list,scores_list=pred_scores_list,model_name_list=model_names_list)

@@ -39,8 +39,8 @@ def dirlist(path, allfile):
 
 def get_config():
     config = dict()
-    config['handle_path'] = '/home/lili/opcode-2017-05'
-    config['re_path'] = '/home/lili/opcode-2017-05-hash2'
+    config['handle_path'] = '/home/raymon/trend_ml_toolkit_xgboost/Data/'
+    config['re_path'] = '/home/raymon/trend_ml_toolkit_xgboost/Data/'
     config['length'] = 1024
     return config
 
