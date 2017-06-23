@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import numpy as np
 import argparse
+from tqdm import tqdm
 
 # parser
 def arg_parser():
@@ -141,6 +142,38 @@ def dirlist(path, allfile):
         else:
             allfile.append(filepath)
     return allfile
+
+def to_NN(data,label,path,NN_name='NN_train.txt',NN_label_name='NNAI_train.txt'):
+    """
+    将传入的 data label  path等等数据，存储为NN数据格式 
+    :param data: ndarray (N,D)
+    :param label: ndarray (N,)
+    :param path: ndarray (N,)
+    :return: 
+    """
+    assert data.shape[0] == label.shape[0] == path.shape[0]
+
+    N = data.shape[0]
+    dim = data.shape[1]
+
+    with open(NN_name,'w') as NN:
+        with open(NN_label_name,'w') as NN_label:
+            NN.write(str(dim)+'\n')
+            NN_label.write(str(dim)+'\n')
+            for i in tqdm(range(N)):
+                case = data[i]
+                indice = np.nonzero(case)[0]
+                line = str(label[i])+';'
+                for index in indice:
+                    line += str(index+1)+';'+str(case[index])+';'
+                line_AI= str(label[i]) + '|' + path[i]
+                if(i!=N-1):
+                    line += '\n'
+                    line_AI += '\n'
+                NN.write(line)
+                NN_label.write(line_AI)
+
+
 
 if __name__ == '__main__':
     # labels,preds_score = get_predictedResults_from_file('Data/rslt_app.txt')

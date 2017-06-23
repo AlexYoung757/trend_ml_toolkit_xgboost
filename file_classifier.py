@@ -1,4 +1,8 @@
 #coding=utf-8
+"""
+文件分拣，将文件分为 train  test 两个结合
+train下面有子目录 0 和 1，是二分类任务的两个label
+"""
 import pandas as pd
 import shutil
 import numpy as np
@@ -9,19 +13,10 @@ from multiprocessing import Pool
 import multiprocessing
 from functools import partial
 
+from tools import dirlist
+
 def start_process():
     print 'Starting',multiprocessing.current_process().name
-
-def dirlist(path, allfile):
-    filelist = os.listdir(path)
-
-    for filename in filelist:
-        filepath = os.path.join(path, filename)
-        if os.path.isdir(filepath):
-            dirlist(filepath, allfile)
-        else:
-            allfile.append(filepath)
-    return allfile
 
 def search_mv(i,refer,files):
     print("%d / %d\n" % (i, len(refer)))
@@ -36,6 +31,24 @@ def search_mv(i,refer,files):
         else:
             re_path = result_path2 if flag == 0  else result_path3
         shutil.copy(case_file[0], re_path)
+
+def search_mv_single_thread(refer,files):
+    for i in range(len(refer)):
+        print("%d / %d\n" % (i, len(refer)))
+        item = refer[i]
+        file_name = item[0] + '.opcode'
+        flag = bool(item[1])
+        cases = files[files[:, 1] == file_name]
+        if (len(cases) != 0):
+            case_file = cases[0]
+            re_path = ''
+            if (phase == 'train'):
+                re_path = result_path0 if flag == 0  else result_path1
+            else:
+                re_path = result_path2 if flag == 0  else result_path3
+            shutil.copy(case_file[0], re_path)
+    print('refer  :  %d\n' % (len(refer)))
+    print('origin :  %d\n' % (len(files)))
 
 if __name__ == '__main__':
 
@@ -69,7 +82,7 @@ if __name__ == '__main__':
     files = files[:,np.newaxis]
     files = np.concatenate((files,files),axis=1)
     for i in range(len(files)):
-        files[i,1] = files[i,1].split('/')[-1]
+        files[i,1] = files[i,1].split('/')[-1] # 得到文件名
     if(phase == 'train'):
         refer = train_np
     else:
